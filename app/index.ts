@@ -1,14 +1,22 @@
 import * as http from 'http';
 import * as debug from 'debug';
 import * as mongoose from 'mongoose';
+import * as config from 'config';
+//db options
+let options = { 
+  server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, 
+  replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } } 
+};
 
-mongoose.connect("mongodb://172.17.30.95:9052/mydb");
+mongoose.connect((<any>config).DBHost, options);
+let db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
 import App from './App';
 
 debug('ts-express:server');
 
-const port = normalizePort(process.env.PORT || 3000);
+const port = normalizePort(process.env.PORT || (<any>config).SERVER_PORT);
 App.set('port', port);
 
 const server = http.createServer(App);
